@@ -1,0 +1,134 @@
+﻿<Page
+    x:Class="IntelligentKioskSample.Views.RealtimeDriverMonitoring"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IntelligentKioskSample.Views"
+    xmlns:ctl="using:IntelligentKioskSample.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    SizeChanged="OnPageSizeChanged"
+    mc:Ignorable="d"
+    x:Name="page">
+
+    <Page.Resources>
+        <ctl:BooleanToVisibilityConverter x:Key="bolleanToVisibilityConverter"/>
+    </Page.Resources>
+    <Grid x:Name="MainGrid" 
+          Background="#FF13172C"
+            EntranceNavigationTransitionInfo.IsTargetElement="True" >
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*" />
+            <RowDefinition Height="0.10*" />
+            <RowDefinition Height="0.05*" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Viewbox Grid.Row="1" Margin="30,0,30,0" >
+            <TextBlock Text="Realtime Driver Monitoring" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontFamily="Segoe UI Light"  Style="{StaticResource HeaderTextBlockStyle}"/>
+        </Viewbox>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="0.2*" x:Name="driverPanelColumn"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="1" VerticalAlignment="Top"    >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Opacity="0.7" Margin="0,0,0,6" >
+
+                    <ComboBox x:Name="inputSourceComboBox" >
+                        <ComboBoxItem Content="Web Cam" IsSelected="True"/>
+                        <ComboBoxItem Content="Video" x:Name="videoInputSource"/>
+                    </ComboBox>
+
+                    <Button VerticalAlignment="Bottom" Margin="6,0,0,0" Background="Transparent" Click="OpenVideoClicked" Visibility="{Binding ElementName=videoInputSource, Path=IsSelected, Converter={StaticResource bolleanToVisibilityConverter}}">
+                        <SymbolIcon Symbol="OpenFile" />
+                    </Button>
+
+                </StackPanel>
+
+                <Grid x:Name="cameraHostGrid" VerticalAlignment="Top" Height="350" Grid.Row="1" >
+                    <ctl:CameraControl x:Name="cameraControl" />
+
+                    <MediaElement x:Name="videoPlayer" AreTransportControlsEnabled="True" Height="350" Visibility="Collapsed">
+                        <MediaElement.TransportControls>
+                            <MediaTransportControls IsPlaybackRateButtonVisible="False" IsFullWindowEnabled="False" IsFullWindowButtonVisible="False" IsZoomButtonVisible="False" IsPlaybackRateEnabled="False" />
+                        </MediaElement.TransportControls>
+                    </MediaElement>
+                </Grid>
+
+                <Grid Background="#11FFFFFF" x:Name="driverPanel" Opacity="1" Margin="6,0,0,0" Grid.Column="1" Grid.Row="1"  Padding="6" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock Text="Driver Id:" Style="{StaticResource SubtitleTextBlockStyle}" FontFamily="Segoe UI Light"  />
+                        <TextBlock x:Name="driverId" Margin="6,0,0,0" Foreground="#FF42BBFA" Text="No faces detected" FontFamily="Segoe UI Light" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    </StackPanel>
+
+                    <Button Opacity="0.7"  Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Right" >
+                        <Button.Content>
+                            <SymbolIcon Symbol="Help"/>
+                        </Button.Content>
+                        <Button.Flyout>
+                            <Flyout>
+                                <ScrollViewer Height="400">
+                                    <TextBlock Margin="0,0,16,0"  Width="400" TextWrapping="WrapWholeWords">
+How to interpret the data?
+<LineBreak/>
+<LineBreak/>
+The Driver Id is determined by identifying the face against the trained faces in the kiosk. You can add more faces via the Face Identification Setup.
+<LineBreak/>
+<LineBreak/>
+The Head Pose chart tracks the direction the driver is looking in relation to the camera. The bars indicate how big the deviation is from the neutral angle. The bars will turn red when the angle crosses above a built-in threshold. The idea here is to flag when a driver is looking away from the road ahead, so try to look towards the left or right and observe what happens to the chart. 
+<LineBreak/>
+<LineBreak/>
+The Mouth Aperture chart tracks the shape of the mouth. The more open the mouth is, the greater the bar. The bars will turn red when the aperture crosses above a built-in threshold. The idea here is to flag when a driver is yawning, so try to fake a yawn and observe what happens to the chart. 
+<LineBreak/>
+<LineBreak/>
+The Eye Aperture chart tracks the shape of the eyes. The more open the eye is, the greater the bar. The bars will turn red when the aperture crosses below a built-in threshold. The idea here is to flag when a driver is napping, so try to close your eyes for a few seconds and observe what happens to the chart. 
+<LineBreak/>
+<LineBreak/>
+The Distractions chart indicates when certain activities are detected. It uses the Computer Vision API to get a caption of what is in front of the camera, and flags with a red bar when it sees certain keywords, like &quot;phone&quot; or &quot;banana&quot;. The idea here is to flag when the driver is doing something not safe, like using the phone or eating a banana."
+                                    </TextBlock>
+                                </ScrollViewer>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <ctl:VerticalBarTimelineControl x:Name="headPoseChart" Header="Head Pose" Grid.Row="1" Margin="0,10,0,0" />
+                    <ctl:VerticalBarTimelineControl x:Name="mouthApertureChart" Header="Mouth Aperture" Grid.Row="2" Margin="0,10,0,0" BarType="Centered" />
+                    <ctl:VerticalBarTimelineControl x:Name="eyeApertureChart" Header="Eye Aperture" Grid.Row="3" Margin="0,10,0,0" BarType="Centered" />
+                    <ctl:VerticalBarTimelineControl x:Name="distractionChart" Header="Distractions" Grid.Row="4" Margin="0,10,0,0" BarType="Centered" />
+
+                    <TextBlock Grid.Row="5" Text="Click on the chart values to see the associated video frames" HorizontalAlignment="Right" FontStyle="Italic" Opacity="0.9" Style="{StaticResource CaptionTextBlockStyle}"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+
+        <StackPanel Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,12,64" Opacity="0.7" >
+            <TextBlock x:Name="highLatencyWarning" Text="Latency is too high!" Foreground="#FF42BBFA" Visibility="Collapsed" HorizontalAlignment="Right" Opacity="0.5"/>
+            <TextBlock x:Name="faceLantencyDebugText" TextAlignment="Right" HorizontalAlignment="Right" Opacity="0.3" Margin="0,4,0,0" Width="180" />
+            <TextBlock x:Name="visionLantencyDebugText" TextAlignment="Right" HorizontalAlignment="Right" Opacity="0.3" Width="180"/>
+        </StackPanel>
+
+    </Grid>
+</Page>

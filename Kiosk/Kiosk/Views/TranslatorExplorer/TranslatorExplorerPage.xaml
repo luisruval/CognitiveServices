@@ -1,0 +1,197 @@
+﻿<Page
+    x:Class="IntelligentKioskSample.Views.TranslatorExplorer.TranslatorExplorerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IntelligentKioskSample.Views.TranslatorExplorer"
+    xmlns:ctl="using:IntelligentKioskSample.Controls"
+    xmlns:p="using:IntelligentKioskSample.Controls.Overlays.Primitives"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    SizeChanged="OnPageSizeChanged"
+    x:Name="mainPage">
+
+    <Page.Resources>
+        <ctl:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
+        <DataTemplate x:Key="SamplePhraseTemplate" x:DataType="local:SamplePhraseViewModel">
+            <TreeViewItem ItemsSource="{Binding Children}" IsExpanded="{Binding IsExpanded}">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="{Binding GroupHeaderSymbol}" Margin="0,0,10,0" 
+                                Visibility="{Binding IsGroupHeader, Converter={StaticResource booleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding Text}"/>
+                </StackPanel>
+            </TreeViewItem>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid x:Name="MainGrid" EntranceNavigationTransitionInfo.IsTargetElement="True" >
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <CommandBar x:Name="commandBar" Style="{StaticResource PageTitleCommandBarStyle}">
+            <CommandBar.Content>
+                <TextBlock Text="Translator API Explorer" Style="{ThemeResource PageTitleTextBlockStyle}"/>
+            </CommandBar.Content>
+        </CommandBar>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <!-- Input column -->
+            <Pivot x:Name="pivotControl" SelectionChanged="Pivot_SelectionChanged">
+                <PivotItem Header="Text">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox PlaceholderText="Auto-Detect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,10"
+                                      ItemsSource="{Binding InputLanguageCollection}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding InputLanguage, Mode=TwoWay}">
+                            </ComboBox>
+                            <Button Grid.Column="1" Margin="10,0,0,0" ToolTipService.ToolTip="Suggestions" HorizontalAlignment="Right">
+                                <SymbolIcon Symbol="Favorite"/>
+                                <Button.Flyout>
+                                    <Flyout x:Name="favoriteTextPickerFlyout" Placement="Bottom">
+                                        <Flyout.FlyoutPresenterStyle>
+                                            <Style TargetType="FlyoutPresenter">
+                                                <Setter Property="Padding" Value="0"/>
+                                                <Setter Property="Margin" Value="0"/>
+                                            </Style>
+                                        </Flyout.FlyoutPresenterStyle>
+                                        <TreeView x:Name="samplePhraseTreeView" Width="350" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" 
+                                                  ItemsSource="{Binding SamplePhraseCollection}"
+                                                  ItemTemplate="{StaticResource SamplePhraseTemplate}"
+                                                  AllowDrop="false" CanDrag="False" CanDragItems="False" 
+                                                  ItemInvoked="SamplePhraseItemInvoked"/>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button Grid.Column="2" Margin="10,0,0,0" Click="OnSwapLanguageButtonClicked" 
+                                    ToolTipService.ToolTip="Swap languages" HorizontalAlignment="Right">
+                                <SymbolIcon Symbol="Switch"/>
+                            </Button>
+                        </Grid>
+                        <Grid>
+                            <TextBox x:Name="inputText" PlaceholderText="Enter text here" AcceptsReturn="True" MaxLength="5000" TextWrapping="Wrap" FontSize="36"
+                                 Padding="10" MinHeight="350" MaxHeight="600" SelectionChanged="OnInputTextSelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
+                                <TextBlock x:Name="inputTextLength" Text="0" Foreground="Gray"/>
+                                <TextBlock Text=" / 5000" Foreground="Gray"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </PivotItem>
+                <PivotItem Header="Image">
+                    <Grid VerticalAlignment="Top" MinHeight="402">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <Button x:Name="suggestionsButton" Background="Transparent" ToolTipService.ToolTip="Suggestions" Padding="10,5" Margin="0,10">
+                                <SymbolIcon Symbol="Favorite"/>
+                                <Button.Flyout>
+                                    <Flyout x:Name="favoriteImagePickerFlyout">
+                                        <GridView x:Name="favoritePhotosGridView" SelectionMode="Single" SelectionChanged="OnFavoriteSelectionChanged" Width="380">
+                                            <GridView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Image Width="120" Height="120" Source="{Binding}"/>
+                                                </DataTemplate>
+                                            </GridView.ItemTemplate>
+                                        </GridView>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button x:Name="webCamButton" Background="Transparent" Click="OnWebCamButtonClicked"
+                                    ToolTipService.ToolTip="WebCam" Padding="10,5" Margin="0,10">
+                                <SymbolIcon Symbol="Video"/>
+                            </Button>
+                            <Button x:Name="searchButton" Background="Transparent" ToolTipService.ToolTip="Search" Padding="10,5" Margin="0,10">
+                                <SymbolIcon Symbol="Globe"/>
+                                <Button.Flyout>
+                                    <Flyout x:Name="imageSearchFlyout">
+                                        <ctl:ImageSearchUserControl ImageContentType="" ClearStateWhenClosed="False" OnImageSearchCompleted="OnImageSearchCompleted" OnImageSearchCanceled="OnImageSearchCanceled"/>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock x:Name="landingMessage" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}">
+                            <Run Text="Select a photo to"/>
+                            <LineBreak/>
+                            <Run Text="extract text from"/>
+                        </TextBlock>
+
+                        <Grid Grid.Row="1" VerticalAlignment="Top">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" x:Name="webCamHostGrid" Visibility="Collapsed">
+                                <p:OverlayPresenter x:Name="WebCamOverlayPresenter" EnableHoverSelection="False">
+                                    <p:OverlayPresenter.ItemTemplate>
+                                        <DataTemplate>
+                                            <p:OverlayControl OverlayTemplate="{StaticResource Overlay.TextOverlay}"/>
+                                        </DataTemplate>
+                                    </p:OverlayPresenter.ItemTemplate>
+                                </p:OverlayPresenter>
+                                <ctl:CameraControl x:Name="cameraControl" FlowDirection="LeftToRight"/>
+                            </Grid>
+                            <Grid Grid.Row="0" x:Name="imageHostGrid" MaxHeight="350">
+                                <p:OverlayPresenter x:Name="ImageOverlayPresenter" EnableHoverSelection="False">
+                                    <p:OverlayPresenter.ItemTemplate>
+                                        <DataTemplate>
+                                            <p:OverlayControl OverlayTemplate="{StaticResource Overlay.TextOverlay}"/>
+                                        </DataTemplate>
+                                    </p:OverlayPresenter.ItemTemplate>
+                                </p:OverlayPresenter>
+                            </Grid>
+
+                            <ProgressRing x:Name="ProgressIndicator" Foreground="White" Width="100" Height="100" />
+
+                            <StackPanel x:Name="ocrTextGrid" Grid.Row="1">
+                                <TextBlock x:Name="detectedLanguageTextBox" Margin="0,5" TextWrapping="Wrap" />
+
+                                <TextBlock Text="Detected Text:" Margin="0,5,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="ocrTextBlock" TextWrapping="Wrap" FontSize="18"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </PivotItem>
+            </Pivot>
+
+            <!-- Output column -->
+            <Pivot Grid.Column="1">
+                <PivotItem>
+                    <StackPanel>
+                        <ComboBox Margin="0,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                                  ItemsSource="{Binding OutputLanguageCollection}" DisplayMemberPath="Name"
+                                  SelectedItem="{Binding OutputLanguage, Mode=TwoWay}">
+                        </ComboBox>
+                        <Grid>
+                            <ProgressRing x:Name="processingRing" Foreground="#FFC1C1B2" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox x:Name="outputText" PlaceholderText="Translation" AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="True" Padding="10" MinHeight="350" MaxHeight="600" FontSize="36" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                        </Grid>
+
+                        <!-- Alternative translations for a word -->
+                        <TextBlock x:Name="lookupLanguageTextBlock" Margin="0,15,0,0" FontSize="16"/>
+                        <local:AlternativeTranslationsControl DataContext="{Binding ElementName=mainPage}"/>
+
+                    </StackPanel>
+                </PivotItem>
+            </Pivot>
+        </Grid>
+        
+    </Grid>
+</Page>
