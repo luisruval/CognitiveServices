@@ -1,6 +1,6 @@
 # CognitiveServices
-Repo del curso de Platzi de Servicios Cognitivos
+Rama 9: Face API
 
-Bienvenido al repo de Servicios Cognitivos de Platzi
+Esta rama está basada en el inicio rápido para la API de rostros (Face) utlizando C#. Las instrucciones completas las puedes encontrar en https://docs.microsoft.com/es-mx/azure/cognitive-services/Face/quickstarts/client-libraries?pivots=programming-language-csharp&tabs=visual-studio
 
-URL del curso:
+Considera que como requisitos es necesario contar con una suscripción de Azure para crear un recurso de Face
