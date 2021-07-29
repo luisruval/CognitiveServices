@@ -10,55 +10,39 @@ namespace _3_TextToSpeech
  
     public class Program
     {
+
+        private static string suscriptionKey = "19807553ff834f218ac29a25f283ce81"; // "YourSuscriptionKey";
+        private static string serviceRegion = "southcentralus"; //"YourServiceRegion";
+
         static async Task Main()
         {
-            await SynthesizeAudioAsync();
-        }
+            await SynthesizeAudioToSpeakerAsync();
+            await SynthesizeAudioToFileAsync();
+        }            
 
-        static async Task SynthesizeAudioAsync1()
-        {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
-        }
-        static async Task SynthesizeAudioAsync2()
-        {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
-            using var audioConfig = AudioConfig.FromWavFileOutput("path/to/write/file.wav");
-        }
+ 
 
-        static async Task SynthesizeAudioAsync3()
+        static async Task SynthesizeAudioToSpeakerAsync()
         {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
-            using var audioConfig = AudioConfig.FromWavFileOutput("path/to/write/file.wav");
-            using var synthesizer = new SpeechSynthesizer(config, audioConfig);
-            await synthesizer.SpeakTextAsync("A simple test to write to a file.");
-        }
-
-        static async Task SynthesizeAudioAsync4()
-        {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
+            var config = SpeechConfig.FromSubscription(suscriptionKey, serviceRegion);
             using var synthesizer = new SpeechSynthesizer(config);
             await synthesizer.SpeakTextAsync("Synthesizing directly to speaker output.");
         }
 
-        static async Task SynthesizeAudioAsync5()
+        static async Task SynthesizeAudioToFileAsync()
         {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
-            using var synthesizer = new SpeechSynthesizer(config, null);
-
-            var result = await synthesizer.SpeakTextAsync("Getting the response as an in-memory stream.");
-            using var stream = AudioDataStream.FromResult(result);
-        }
-
-        static async Task SynthesizeAudioAsync()
-        {
-            var config = SpeechConfig.FromSubscription("YourSubscriptionKey", "YourServiceRegion");
+            var config = SpeechConfig.FromSubscription(suscriptionKey, serviceRegion);
             config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
+  
 
-            using var synthesizer = new SpeechSynthesizer(config, null);
-            var result = await synthesizer.SpeakTextAsync("Customizing audio output format.");
+            using var synthesizer = new SpeechSynthesizer(config, null);           
 
-            using var stream = AudioDataStream.FromResult(result);
-            await stream.SaveToWaveFileAsync("path/to/write/file.wav");
+            var ssml = File.ReadAllText("ssml.xml");
+            var resultssml = await synthesizer.SpeakSsmlAsync(ssml);
+
+            using var stream = AudioDataStream.FromResult(resultssml);
+            await stream.SaveToWaveFileAsync("output-test.wav");
+
         }
 
 
