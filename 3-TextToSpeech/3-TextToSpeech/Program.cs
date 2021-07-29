@@ -11,8 +11,8 @@ namespace _3_TextToSpeech
     public class Program
     {
 
-        private static string suscriptionKey = "19807553ff834f218ac29a25f283ce81"; // "YourSuscriptionKey";
-        private static string serviceRegion = "southcentralus"; //"YourServiceRegion";
+        private static string suscriptionKey = "YourSuscriptionKey";
+        private static string serviceRegion = "YourServiceRegion";
 
         static async Task Main()
         {
