@@ -2,13 +2,18 @@
 using System;
 using System.Globalization;
 using Azure.AI.TextAnalytics;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace TextAnalytics
 {
     class Program
     {
-        private static readonly AzureKeyCredential credentials = new AzureKeyCredential("<replace-with-your-text-analytics-key-here>");
+        private static readonly AzureKeyCredential credentials = new AzureKeyCredential("YourSuscriptionKey");
+
         private static readonly Uri endpoint = new Uri("<replace-with-your-text-analytics-endpoint-here>");
+
         static void Main(string[] args)
         {
             var client = new TextAnalyticsClient(endpoint, credentials);
@@ -182,7 +187,7 @@ namespace TextAnalytics
             Console.WriteLine($"Last modified: {operation.LastModified}");
             if (!string.IsNullOrEmpty(operation.DisplayName))
                 Console.WriteLine($"Display name: {operation.DisplayName}");
-            Console.WriteLine($"Total actions: {operation.TotalActions}");
+            Console.WriteLine($"Total actions: {operation.ActionsTotal}");
             Console.WriteLine($"  Succeeded actions: {operation.ActionsSucceeded}");
             Console.WriteLine($"  Failed actions: {operation.ActionsFailed}");
             Console.WriteLine($"  In progress actions: {operation.ActionsInProgress}");
