@@ -1,6 +1,4 @@
 # CognitiveServices
-Repo del curso de Platzi de Servicios Cognitivos
+Rama 10: Integrando LUIS en una aplicación de consola
 
-Bienvenido al repo de Servicios Cognitivos de Platzi
-
-URL del curso:
+Esta rama está basada en este repo: https://github.com/Azure-Samples/cognitive-services-dotnet-sdk-samples/tree/master/LUIS/Runtime 
