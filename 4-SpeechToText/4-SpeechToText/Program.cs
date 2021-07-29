@@ -10,7 +10,7 @@ namespace _4_SpeechToText
     {
         async static Task Main(string[] args)
         {
-            var speechConfig = SpeechConfig.FromSubscription("c532071dea994dc99f463d04a8b38437", "southcentralus");
+            var speechConfig = SpeechConfig.FromSubscription("YourSuscriptionKey", "YourServiceRegion");
 
             Console.WriteLine("Speech to Text using Microphone");
             await FromMic(speechConfig);
